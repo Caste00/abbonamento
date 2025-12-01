@@ -48,5 +48,5 @@ def decisore(viaggi):
 
 
 if __name__ == "__main__":
-    viaggio = input(". per i giorni in cui non si viaggia e 1 per il viaggio: ")
+    viaggio = input("Scrivere . per i giorni in cui non si viaggia e 1 per il viaggio: ")
     decisore(viaggio)
