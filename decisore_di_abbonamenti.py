@@ -35,7 +35,7 @@ def decisore(viaggi):
             opzioni.append(COSTI["trimestrale"])
 
         minimo = min(opzioni)
-        scelta = str(f"giorno {i} ") + scelte[opzioni.index(minimo)]
+        scelta = str(f"giorno {i} -> ") + scelte[opzioni.index(minimo)]
 
         stati.append(minimo)
         abbonamenti.append(scelta)
