@@ -1,52 +1,54 @@
 COSTI = {
-    "corsa_semplice": 11.20,  # una corsa è 5.60 €
+    "biglietto": 11.20,  # una corsa è 5.60 €
     "settimanale": 32.20,
     "mensile":113.50,
     "trimestrale": 308.00,
 }
 
+DURATA = {
+    "biglietto": 1,
+    "settimanale": 7,
+    "mensile": 30,
+    "trimestrale": 90,
+}
+
+# potrebbe avere senso una funzione get_next_day, così da gestire in un altra funzione il formato di viaggi
 def decisore(viaggi): 
-    stati = [0]
+    n = len(viaggi)
+    stati = [0] * (n + 1)   
+    scelta = [None] * (n + 1)
+    
+    for i, c in enumerate(viaggi, 1): 
+        if (c == '.' or not c):
+            stati[i] = stati[i - 1]
+            scelta[i] = "Nessuno"
+            continue
+        
+        opzioni = []        
+        for tipo in COSTI.keys():
+            durata = DURATA[tipo]
+            costo = COSTI[tipo]
+            if i >= durata:
+                totale = stati[i - durata] + costo
+            else:
+                totale = costo
+            opzioni.append((totale, tipo))
+            
+        costo_minimo, tipo_minimo = min(opzioni, key=lambda x: x[0])
+        stati[i] = costo_minimo
+        scelta[i] = tipo_minimo
+        
+    print(f"La spesa minima è di {round(stati[-1],2)} €")
+    
+    # Ricostruzione degli abbonamenti
     abbonamenti = []
-
-    for i, c in enumerate(viaggi, start=1):
-        if c == '.' or not c:
-            stati.append(stati[-1])
-            continue    
-        
-        opzioni = []
-        scelte  = ["biglietto", "settimanale", "mensile", "trimestrale"]
-        
-        opzioni.append(stati[i - 1] + COSTI["corsa_semplice"])
-
-        if i >= 7:
-            opzioni.append(stati[i - 7] + COSTI["settimanale"])
+    i = n
+    while i > 0:
+        tipo = scelta[i]
+        if tipo and tipo != "Nessuno":
+            abbonamenti.append((i - DURATA[tipo] + 1, i, tipo))
+            i -= DURATA[tipo]
         else:
-            opzioni.append(COSTI["settimanale"])
-        
-        if i >= 30:
-            opzioni.append(stati[i - 30] + COSTI["mensile"])
-        else:
-            opzioni.append(COSTI["mensile"])
-
-        if i >= 90:
-            opzioni.append(stati[i - 90] + COSTI["trimestrale"])
-        else:
-            opzioni.append(COSTI["trimestrale"])
-
-        minimo = min(opzioni)
-        scelta = str(f"giorno {i} -> ") + scelte[opzioni.index(minimo)]
-
-        stati.append(minimo)
-        abbonamenti.append(scelta)
-
-
-    print(f"La spesa minima è di {round(stati[-1], 2)} €")
-    print(f"Gli abbonamenti da comprare sono: ")
-    for a in abbonamenti:
-        print(a)
-
-
-if __name__ == "__main__":
-    viaggio = input("Scrivere . per i giorni in cui non si viaggia e 1 per il viaggio: ")
-    decisore(viaggio)
+            i -= 1
+            
+    return stati[-1], abbonamenti
